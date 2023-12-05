@@ -3,37 +3,37 @@ package adapter
 import "fmt"
 
 type ILogin interface {
-	Login(username, password string) error
+	Login(username string, password string)
 }
 
-type INewLogin interface {
-	NewLogin(username, password, captcha string) error
+type OriginalLogin struct {
 }
 
-type User struct {
+func NewOriginalLogin() *OriginalLogin {
+	return &OriginalLogin{}
 }
 
-func (*User) Login(username, password string) error {
-	fmt.Printf("username: %s, password: %s\n", username, password)
-	return nil
+func (impl *OriginalLogin) Login(username string, password string) {
+	fmt.Printf("OriginalLogin username %v password %v\n", username, password)
 }
 
-type LoginAdapter struct {
-	ILogin ILogin
+type CaptchaILogin interface {
+	LoginWithCaptcha(username string, password string, captcha string)
 }
 
-func (a *LoginAdapter) NewLogin(username, password, captcha string) error {
-	fmt.Println("LoginAdapter start")
-	defer fmt.Println("LoginAdapter end")
-	fmt.Println("check captcha:", captcha)
-	if err := a.ILogin.Login(username, password); err != nil {
-		return err
+type AliYunCaptchaLogin struct {
+	i ILogin
+}
+
+func NewAliYunCaptchaLogin(iLogin ILogin) *AliYunCaptchaLogin {
+	return &AliYunCaptchaLogin{
+		i: iLogin,
 	}
-	return nil
 }
 
-func NewLoginAdapter(login ILogin) *LoginAdapter {
-	return &LoginAdapter{
-		ILogin: login,
+func (impl *AliYunCaptchaLogin) LoginWithCaptcha(username string, password string, captcha string) {
+	if len(captcha) > 0 {
+		fmt.Printf("check captcha %v\n", captcha)
 	}
+	impl.i.Login(username, password)
 }

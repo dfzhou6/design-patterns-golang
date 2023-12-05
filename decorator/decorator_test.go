@@ -1,8 +1,13 @@
 package decorator
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func TestNewCoffee(t *testing.T) {
-	c := &Coffee{IFavor: &Sugar{IFavor: &Milk{}}}
-	c.ShowFavor()
+func TestDecorator(t *testing.T) {
+	simpleCoffee := &SimpleCoffee{}
+	sugarCoffee := &SugarCoffee{coffee: simpleCoffee}
+	milkCoffee := &MilkCoffee{coffee: sugarCoffee}
+	fmt.Printf("coffee cost: %v, desc: %v\n", milkCoffee.GetCost(), milkCoffee.GetDesc())
 }

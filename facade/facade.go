@@ -1,68 +1,45 @@
 package facade
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
-type User struct {
-	Username string
-	Password string
+type UserLogin interface {
+	Login(username string, password string)
 }
 
-type ILogin interface {
-	Login(username, password, captcha string) error
+type UserRegister interface {
+	Register(username string, password string, email string)
 }
 
-type IGetOneUser interface {
-	GetOne(username string) (User, error)
+type UserLoginImpl struct {
 }
 
-type IVerifyCaptcha interface {
-	Verify(captcha string) error
+func (impl *UserLoginImpl) Login(username string, password string) {
+	fmt.Printf("user login username %v password %v\n", username, password)
 }
 
-type LoginFacade struct {
-	IGetOneUser    IGetOneUser
-	IVerifyCaptcha IVerifyCaptcha
+type UserRegisterImpl struct {
 }
 
-func GetLoginFacade() LoginFacade {
-	return LoginFacade{
-		IGetOneUser:    &UserService{},
-		IVerifyCaptcha: &VerifyCaptchaService{},
+func (impl *UserRegisterImpl) Register(username string, password string, email string) {
+	fmt.Printf("user register username %v password %v email %v\n", username, password, email)
+}
+
+type UserFacade struct {
+	login    UserLogin
+	register UserRegister
+}
+
+func NewUserFacade() *UserFacade {
+	return &UserFacade{
+		login:    &UserLoginImpl{},
+		register: &UserRegisterImpl{},
 	}
 }
 
-func (l *LoginFacade) Login(username, password, captcha string) error {
-	var err error
-
-	if err = l.IVerifyCaptcha.Verify(captcha); err != nil {
-		return err
-	}
-	user, err := l.IGetOneUser.GetOne(username)
-	if err != nil {
-		return err
-	}
-	if user.Password != password {
-		return errors.New("username or password incorrect")
-	}
-
-	return nil
+func (impl *UserFacade) Login(username string, password string) {
+	impl.login.Login(username, password)
 }
 
-type VerifyCaptchaService struct {
-}
-
-func (*VerifyCaptchaService) Verify(captcha string) error {
-	fmt.Println("VerifyCaptchaService Verify", captcha)
-	return nil
-}
-
-type UserService struct {
-}
-
-func (*UserService) GetOne(username string) (User, error) {
-	fmt.Println("UserService GetOne", username)
-	return User{Username: username, Password: "123456"}, nil
+func (impl *UserFacade) Register(username string, password string, email string) {
+	impl.register.Register(username, password, email)
 }

@@ -2,15 +2,14 @@ package facade
 
 import "testing"
 
-func TestLoginFacade(t *testing.T) {
-	var err error
+const (
+	username = "felix"
+	password = "123456"
+	email    = "zhoudf6@gmail.com"
+)
 
-	f := GetLoginFacade()
-	if err = f.Login("felix", "123456", "abcdef"); err != nil {
-		t.Error(err)
-	}
-	if err = f.Login("felix", "654321", "abcdef"); err == nil {
-		t.Error("should not be success")
-	}
-	t.Log(err)
+func TestUserFacade(t *testing.T) {
+	f := NewUserFacade()
+	f.Login(username, password)
+	f.Register(username, password, email)
 }

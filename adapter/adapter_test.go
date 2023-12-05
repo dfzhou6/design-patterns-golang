@@ -8,10 +8,10 @@ const (
 	captcha  = "abcefg"
 )
 
-func TestNewLoginAdapter(t *testing.T) {
-	user := &User{}
-	adapter := NewLoginAdapter(user)
-	if err := adapter.NewLogin(username, password, captcha); err != nil {
-		t.Errorf("NewLogin failed, err: %v", err)
-	}
+func TestAdapter(t *testing.T) {
+	var iLogin ILogin
+	var cLogin CaptchaILogin
+	iLogin = NewOriginalLogin()
+	cLogin = NewAliYunCaptchaLogin(iLogin)
+	cLogin.LoginWithCaptcha(username, password, captcha)
 }

@@ -2,42 +2,62 @@ package bridge
 
 import "fmt"
 
-type IColor interface {
+type Shape interface {
+	ShowShape()
+}
+
+type Color interface {
 	ShowColor()
 }
 
-type ICar interface {
-	ShowCar()
+type BaseShape struct {
+	c Color
 }
 
-type SmallCar struct {
-	IColor IColor
+func (impl *BaseShape) ShowShape() {
+	panic("pls implement me")
 }
 
-func (s *SmallCar) ShowCar() {
-	fmt.Println("this is small car")
-	s.IColor.ShowColor()
+type Square struct {
+	*BaseShape
 }
 
-type BigCar struct {
-	IColor IColor
+func NewSquare(color Color) *Square {
+	return &Square{
+		&BaseShape{c: color},
+	}
 }
 
-func (b *BigCar) ShowCar() {
-	fmt.Println("this is big car")
-	b.IColor.ShowColor()
+func (impl *Square) ShowShape() {
+	fmt.Println("this is shape Square")
+	impl.c.ShowColor()
+}
+
+type Circle struct {
+	*BaseShape
+}
+
+func NewCircle(color Color) *Circle {
+	return &Circle{
+		&BaseShape{c: color},
+	}
+}
+
+func (impl *Circle) ShowShape() {
+	fmt.Println("this is shape circle")
+	impl.c.ShowColor()
 }
 
 type Red struct {
 }
 
-func (r *Red) ShowColor() {
-	fmt.Println("red color")
+func (impl *Red) ShowColor() {
+	fmt.Println("this is color red")
 }
 
-type Black struct {
+type Blue struct {
 }
 
-func (b *Black) ShowColor() {
-	fmt.Println("black color")
+func (impl *Blue) ShowColor() {
+	fmt.Println("this is color blue")
 }

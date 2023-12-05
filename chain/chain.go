@@ -2,42 +2,73 @@ package chain
 
 import "fmt"
 
-type IFilter interface {
-	Filter(content string) error
+type LeaveRequest struct {
+	Days int
 }
 
-type FilterList struct {
-	filterList []IFilter
+type LeaveRequestHandler interface {
+	SetNextHandler(handler LeaveRequestHandler)
+	HandleLeaveRequest(req *LeaveRequest)
 }
 
-func (f *FilterList) Add(filter IFilter) {
-	f.filterList = append(f.filterList, filter)
+type BaseLeaveRequestHandler struct {
+	nextHandler LeaveRequestHandler
 }
 
-func (f *FilterList) Filter(content string) error {
-	var err error
+func (impl *BaseLeaveRequestHandler) SetNextHandler(handler LeaveRequestHandler) {
+	impl.nextHandler = handler
+}
 
-	for _, filter := range f.filterList {
-		if err = filter.Filter(content); err != nil {
-			return err
-		}
+func (impl *BaseLeaveRequestHandler) HandleLeaveRequest(req *LeaveRequest) {
+	panic("pls implement me")
+}
+
+type HRLeaveRequestHandler struct {
+	*BaseLeaveRequestHandler
+}
+
+func NewHRLeaveRequestHandler() *HRLeaveRequestHandler {
+	return &HRLeaveRequestHandler{&BaseLeaveRequestHandler{}}
+}
+
+func (impl *HRLeaveRequestHandler) HandleLeaveRequest(req *LeaveRequest) {
+	if req.Days < 5 {
+		fmt.Printf("hr handle this leave request, days is %v\n", req.Days)
+		return
 	}
-
-	return nil
+	fmt.Printf("hr handle can't do this leave request, days is %v\n", req.Days)
+	if impl.nextHandler != nil {
+		impl.nextHandler.HandleLeaveRequest(req)
+	}
 }
 
-type WordFilter struct {
+type ManagerLeaveRequestHandler struct {
+	*BaseLeaveRequestHandler
 }
 
-func (*WordFilter) Filter(content string) error {
-	fmt.Println("word filter", content)
-	return nil
+func NewManagerLeaveRequestHandler() *ManagerLeaveRequestHandler {
+	return &ManagerLeaveRequestHandler{&BaseLeaveRequestHandler{}}
 }
 
-type LenFilter struct {
+func (impl *ManagerLeaveRequestHandler) HandleLeaveRequest(req *LeaveRequest) {
+	if req.Days < 10 {
+		fmt.Printf("manager handle this leave request, days is %v\n", req.Days)
+		return
+	}
+	fmt.Printf("manager handle can't do this leave request, days is %v\n", req.Days)
+	if impl.nextHandler != nil {
+		impl.nextHandler.HandleLeaveRequest(req)
+	}
 }
 
-func (*LenFilter) Filter(content string) error {
-	fmt.Println("len filter", content)
-	return nil
+type DirectorLeaveRequestHandler struct {
+	*BaseLeaveRequestHandler
+}
+
+func NewDirectorLeaveRequestHandler() *DirectorLeaveRequestHandler {
+	return &DirectorLeaveRequestHandler{&BaseLeaveRequestHandler{}}
+}
+
+func (impl *DirectorLeaveRequestHandler) HandleLeaveRequest(req *LeaveRequest) {
+	fmt.Printf("director handle this leave request, days is %v\n", req.Days)
 }

@@ -2,33 +2,39 @@ package proxy
 
 import "fmt"
 
-type ILogin interface {
-	Login(username, password string) error
+type LoginService interface {
+	Login(username, password string)
 }
 
-type User struct {
+type UserService struct {
 }
 
-func (u *User) Login(username, password string) error {
-	fmt.Printf("username: %s, password: %s\n", username, password)
-	return nil
+func NewUserService() *UserService {
+	return &UserService{}
 }
 
-type UserProxy struct {
-	ILogin ILogin
+func (impl *UserService) Login(username, password string) {
+	fmt.Printf("user service login user, username: %v, password: %v\n", username, password)
 }
 
-func (up *UserProxy) Login(username, password string) error {
-	fmt.Println("user proxy do log start")
-	defer fmt.Println("user proxy do log end")
-	if err := up.ILogin.Login(username, password); err != nil {
-		return err
+type UserServiceProxy struct {
+	loginSrv LoginService
+}
+
+func NewUserServiceProxy(loginSrv LoginService) *UserServiceProxy {
+	return &UserServiceProxy{
+		loginSrv: loginSrv,
 	}
-	return nil
 }
 
-func NewUserProxy(login ILogin) *UserProxy {
-	return &UserProxy{
-		ILogin: login,
-	}
+func (impl *UserServiceProxy) checkAccess(username string) {
+	fmt.Printf("user service proxy check access %v\n", username)
+}
+
+func (impl *UserServiceProxy) Login(username, password string) {
+	// check access
+	impl.checkAccess(username)
+
+	// do login
+	impl.loginSrv.Login(username, password)
 }

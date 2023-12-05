@@ -7,10 +7,9 @@ const (
 	password = "123456"
 )
 
-func TestNewUserProxy(t *testing.T) {
-	login := &User{}
-	up := NewUserProxy(login)
-	if err := up.Login(username, password); err != nil {
-		t.Errorf("login failed, err: %v", err)
-	}
+func TestProxy(t *testing.T) {
+	userSrv := NewUserService()
+	userSrv.Login(username, password)
+	userSrvPx := NewUserServiceProxy(userSrv)
+	userSrvPx.Login(username, password)
 }

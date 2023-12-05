@@ -2,12 +2,20 @@ package chain
 
 import "testing"
 
-func TestFilterList_Filter(t *testing.T) {
-	f := &FilterList{}
-	f.Add(&WordFilter{})
-	f.Add(&LenFilter{})
+func TestChain(t *testing.T) {
+	hr := NewHRLeaveRequestHandler()
+	manager := NewManagerLeaveRequestHandler()
+	director := NewDirectorLeaveRequestHandler()
 
-	if err := f.Filter("hello felix"); err != nil {
-		t.Errorf("filter failed, err: %v", err)
-	}
+	hr.SetNextHandler(manager)
+	manager.SetNextHandler(director)
+
+	req := &LeaveRequest{Days: 3}
+	hr.HandleLeaveRequest(req)
+
+	req.Days = 7
+	hr.HandleLeaveRequest(req)
+
+	req.Days = 12
+	hr.HandleLeaveRequest(req)
 }

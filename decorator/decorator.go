@@ -1,40 +1,41 @@
 package decorator
 
-import "fmt"
-
-type IFavor interface {
-	ShowFavor()
+type Coffee interface {
+	GetCost() int
+	GetDesc() string
 }
 
-type Coffee struct {
-	IFavor IFavor
+type SimpleCoffee struct {
 }
 
-func (c *Coffee) ShowFavor() {
-	fmt.Println("this is coffee")
-	if c.IFavor != nil {
-		c.IFavor.ShowFavor()
-	}
+func (impl *SimpleCoffee) GetCost() int {
+	return 10
 }
 
-type Sugar struct {
-	IFavor IFavor
+func (impl *SimpleCoffee) GetDesc() string {
+	return "coffee"
 }
 
-func (s *Sugar) ShowFavor() {
-	fmt.Println("add sugar")
-	if s.IFavor != nil {
-		s.IFavor.ShowFavor()
-	}
+type SugarCoffee struct {
+	coffee Coffee
 }
 
-type Milk struct {
-	IFavor IFavor
+func (impl *SugarCoffee) GetCost() int {
+	return impl.coffee.GetCost() + 2
 }
 
-func (i *Milk) ShowFavor() {
-	fmt.Println("add milk")
-	if i.IFavor != nil {
-		i.IFavor.ShowFavor()
-	}
+func (impl *SugarCoffee) GetDesc() string {
+	return impl.coffee.GetDesc() + ", sugar"
+}
+
+type MilkCoffee struct {
+	coffee Coffee
+}
+
+func (impl *MilkCoffee) GetCost() int {
+	return impl.coffee.GetCost() + 3
+}
+
+func (impl *MilkCoffee) GetDesc() string {
+	return impl.coffee.GetDesc() + ", milk"
 }
